@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b1519">
+  <meta name="description" content="A private, browser-based personal expense and credit tracker with yearly Excel exports.">
+  <title>Daily Ledger · Expense & Credit Tracker</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <div class="sidebar-scrim" id="sidebarScrim" hidden></div>
+    <aside class="sidebar" id="sidebar" aria-label="Main menu">
+      <div class="brand"><span class="brand-icon">▤</span><div><strong>daily ledger</strong><small>YOUR MONEY, SIMPLIFIED</small></div></div>
+      <p class="sidebar-heading">WORKSPACE</p>
+      <nav class="main-nav" aria-label="Navigation">
+        <button class="nav-link active" type="button" data-page="overview"><span class="nav-glyph">◫</span> Overview</button>
+        <button class="nav-link" type="button" data-page="add"><span class="nav-glyph">＋</span> Add entry</button>
+        <button class="nav-link" type="button" data-page="history"><span class="nav-glyph">≡</span> History</button>
+        <button class="nav-link" type="button" data-page="credits"><span class="nav-glyph">⇄</span> Credits <span class="nav-count" id="creditNavCount"></span></button>
+      </nav>
+      <p class="sidebar-heading bottom-heading">YOUR DATA</p>
+      <nav class="main-nav" aria-label="Data tools"><button class="nav-link" type="button" data-page="export"><span class="nav-glyph">⇩</span> Excel & backup</button></nav>
+      <div class="sidebar-tip"><span class="small-dot"></span><div>Saved on this device<small>Download a backup to keep your records safe.</small></div></div>
+    </aside>
+
+    <div class="workspace">
+      <header class="topbar">
+        <div class="topbar-left"><button id="menuButton" class="icon-button menu-button" type="button" aria-label="Open menu" aria-expanded="false">☰</button><span class="mobile-brand">daily ledger</span><span class="breadcrumb">PERSONAL FINANCE / <span id="breadcrumbPage">OVERVIEW</span></span></div>
+        <div class="topbar-right"><span class="today-label" id="todayLabel"></span><button type="button" class="topbar-add" data-page="add"><span>＋</span><span class="button-word"> Add entry</span></button></div>
+      </header>
+      <main class="content">
+        <div class="page-heading"><div><p class="eyebrow" id="pageEyebrow">YOUR MONTH AT A GLANCE</p><h1 id="pageTitle">Overview</h1><p class="page-description" id="pageDescription">See what came in, what went out, and what is still owed.</p></div><div class="period-picker" id="periodPicker"><button type="button" id="prevMonth" aria-label="Previous month">‹</button><span id="periodName">November 2026</span><button type="button" id="nextMonth" aria-label="Next month">›</button></div></div>
+
+        <section class="page-view" id="view-overview">
+          <div class="stat-grid">
+            <article class="stat-card stat-card-primary"><div class="stat-header"><span>Money spent</span><span class="stat-symbol">↗</span></div><strong class="stat-number" id="statSpent">₹0</strong><span class="stat-hint">Total expenses this month</span></article>
+            <article class="stat-card"><div class="stat-header"><span>Money received</span><span class="stat-symbol received">↙</span></div><strong class="stat-number" id="statIncome">₹0</strong><span class="stat-hint">All income logged this month</span></article>
+            <article class="stat-card"><div class="stat-header"><span>Net movement</span><span class="stat-symbol">≈</span></div><strong class="stat-number" id="statNet">₹0</strong><span class="stat-hint">Received minus spent · excludes credits</span></article>
+          </div>
+          <div class="two-column">
+            <div class="panel"><div class="panel-header"><div><h2>Recent activity</h2><p>Latest entries this month</p></div><button class="text-link" type="button" data-page="history">View all →</button></div><div id="recentActivity" class="activity-list"></div></div>
+            <div class="panel"><div class="panel-header"><div><h2>Spending breakdown</h2><p>Where your money went</p></div></div><div id="breakdown" class="breakdown"></div><div class="divider-line"></div><div class="panel-header small-panel-heading"><div><h2>Open credits</h2><p>Tracked separately from spending</p></div><button class="text-link" type="button" data-page="credits">Manage →</button></div><div class="credit-summary"><div><small>To receive</small><strong id="overviewToReceive">₹0</strong></div><div><small>To repay</small><strong id="overviewToRepay">₹0</strong></div></div></div>
+          </div>
+        </section>
+
+        <section class="page-view" id="view-add" hidden>
+          <div class="form-panel panel"><div class="panel-header"><div><h2 id="formHeading">New money entry</h2><p>Only the details you need, nothing extra.</p></div></div>
+            <form id="entryForm" novalidate>
+              <div class="segment-control" role="group" aria-label="Entry type"><button type="button" class="segment selected" data-entry-type="expense">↗ Money spent</button><button type="button" class="segment" data-entry-type="income">↙ Money received</button></div>
+              <div class="form-grid"><div class="field full"><label for="entryAmount">Amount <span class="required">*</span></label><div class="money-input"><span id="currencySign">₹</span><input id="entryAmount" name="amount" type="number" min="0.01" step="0.01" placeholder="0.00" inputmode="decimal" required autocomplete="off"></div></div>
+              <div class="field full"><label for="entryPlace" id="entryPlaceLabel">Where did you spend it? <span class="required">*</span></label><input id="entryPlace" name="place" type="text" maxlength="100" placeholder="e.g. Grocery shop, Rahul, Petrol" required></div>
+              <div class="field"><label for="entryDate">Date <span class="required">*</span></label><input id="entryDate" type="date" required></div>
+              <div class="field"><label for="entryMethod">Payment method <span class="required">*</span></label><select id="entryMethod" required><option value="Cash">Cash</option><option value="GPay">GPay</option></select></div>
+              <div class="field full" id="categoryField"><label for="entryCategory">Category</label><select id="entryCategory"><option>Food & drinks</option><option>Groceries</option><option>Shopping</option><option>Transport</option><option>Rent & bills</option><option>Health</option><option>Entertainment</option><option>Other</option></select></div>
+              <div class="field full"><label for="entryNote">Note <span class="optional">(optional)</span></label><textarea id="entryNote" rows="3" maxlength="400" placeholder="Anything you want to remember"></textarea></div></div>
+              <div class="form-actions"><button class="primary-button" type="submit" id="saveEntryButton">Save entry →</button><button class="secondary-button" type="button" id="resetEntryButton">Clear form</button><button class="secondary-button" type="button" id="cancelEditButton" hidden>Cancel editing</button></div>
+            </form>
+          </div>
+        </section>
+
+        <section class="page-view" id="view-history" hidden><div class="panel"><div class="panel-header"><div><h2>Transaction history</h2><p id="historyCount">All entries for the selected month</p></div></div><div class="history-controls"><label class="search-field"><span>⌕</span><input id="historySearch" type="search" placeholder="Search name, place or note" aria-label="Search entries"></label><select id="historyType" aria-label="Filter entry type"><option value="all">All entries</option><option value="expense">Money spent</option><option value="income">Money received</option></select></div><div id="historyList" class="activity-list history-list"></div></div></section>
+
+        <section class="page-view" id="view-credits" hidden><div class="credit-stat-grid"><div class="stat-card"><div class="stat-header"><span>Others owe you</span><span class="stat-symbol received">↙</span></div><strong id="creditToReceive" class="stat-number">₹0</strong><span class="stat-hint">Still to be received</span></div><div class="stat-card"><div class="stat-header"><span>You owe others</span><span class="stat-symbol">↗</span></div><strong id="creditToRepay" class="stat-number">₹0</strong><span class="stat-hint">Still to be repaid</span></div></div>
+          <div class="two-column credit-layout"><div class="panel"><div class="panel-header"><div><h2>Track a credit</h2><p>Keep lending and borrowing in one place.</p></div></div><form id="creditForm" novalidate><div class="field"><label for="creditDirection">This money is…</label><select id="creditDirection"><option value="lent">Owed to me (I lent it)</option><option value="borrowed">Owed by me (I borrowed it)</option></select></div><div class="field"><label for="creditPerson">Person's name <span class="required">*</span></label><input type="text" id="creditPerson" maxlength="100" placeholder="e.g. Amit" required></div><div class="field"><label for="creditAmount">Original amount <span class="required">*</span></label><input type="number" id="creditAmount" min="0.01" step="0.01" inputmode="decimal" placeholder="0.00" required></div><div class="field"><label for="creditDate">Date <span class="required">*</span></label><input type="date" id="creditDate" required></div><div class="field"><label for="creditNote">Note <span class="optional">(optional)</span></label><input type="text" maxlength="250" id="creditNote" placeholder="Why, or any details"></div><button class="primary-button full-width" type="submit">Add credit →</button><p class="form-footnote">Credits are tracked separately from ordinary spending and income, so they do not change those totals.</p></form></div>
+          <div class="panel"><div class="panel-header"><div><h2>Credit ledger</h2><p>Record full or partial repayments.</p></div></div><div class="pill-filters" role="group" aria-label="Credit status"><button type="button" data-credit-filter="open" class="pill active">Open</button><button type="button" data-credit-filter="settled" class="pill">Settled</button><button type="button" data-credit-filter="all" class="pill">All</button></div><div id="creditsList" class="credits-list"></div></div></div></section>
+
+        <section class="page-view" id="view-export" hidden><div class="two-column export-layout"><div class="panel"><div class="panel-header"><div><h2>Excel workbook</h2><p>One file per year, with a tab for every month.</p></div><span class="file-icon">XLSX</span></div><div class="excel-preview"><span class="excel-file">▦</span><div><strong id="exportFileName">Daily_Ledger_2026.xlsx</strong><small>Overview · January–December · Credits · Repayments</small></div></div><div class="field"><label for="exportYear">Which year?</label><select id="exportYear"></select></div><button type="button" class="primary-button full-width" id="exportExcelButton">↓ Download Excel</button><p class="form-footnote">Each month has its entries, with amount, date, person or place, payment method and notes.</p></div>
+          <div class="panel"><div class="panel-header"><div><h2>Backup & restore</h2><p>Move your data to another phone or browser.</p></div></div><button type="button" id="downloadBackupButton" class="secondary-button full-width">↓ Download full backup (.json)</button><div class="divider-line"></div><label class="upload-label" for="restoreFile">Restore from a backup <span>Choose a .json file</span></label><input id="restoreFile" type="file" accept="application/json,.json"><p class="warning-note">Restoring a backup replaces the data currently saved in this browser. Keep your backup file somewhere safe.</p><div class="divider-line"></div><div class="field"><label for="currencyPicker">Display currency</label><select id="currencyPicker"><option value="INR">INR — Indian Rupee (₹)</option><option value="AUD">AUD — Australian Dollar (A$)</option><option value="USD">USD — US Dollar ($)</option></select></div><p class="form-footnote">Currency changes the symbol only; existing amounts are not converted.</p></div></div>
+          <div class="privacy-note"><strong>About your data</strong><p>Everything is stored locally in this browser. GitHub Pages hosts the app, not your private financial records. Clearing browser data, using another browser, or changing phones may mean the entries are unavailable unless you restore a backup.</p></div></section>
+      </main>
+    </div>
+  </div>
+  <dialog id="paymentDialog" class="payment-dialog"><form id="paymentForm" method="dialog"><div class="dialog-header"><div><h2>Record repayment</h2><p id="paymentDialogDescription">Enter the amount returned.</p></div><button type="button" id="closePaymentDialog" class="close-dialog" aria-label="Close dialog">×</button></div><div class="field"><label for="paymentAmount">Amount <span class="required">*</span></label><input type="number" id="paymentAmount" min="0.01" step="0.01" required inputmode="decimal"></div><div class="form-grid"><div class="field"><label for="paymentDate">Date</label><input type="date" id="paymentDate" required></div><div class="field"><label for="paymentMethod">Method</label><select id="paymentMethod"><option>Cash</option><option>GPay</option></select></div></div><div class="form-actions"><button class="primary-button" id="savePaymentButton" type="submit">Save repayment</button><button class="secondary-button" id="cancelPaymentButton" type="button">Cancel</button></div></form></dialog>
+  <div id="toast" class="toast" aria-live="polite" role="status"></div>
+  <script src="xlsx-lite.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
